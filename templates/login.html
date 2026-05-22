@@ -1,0 +1,340 @@
+{% extends "base.html" %} {% block title %}Login - Legal AI Assistant{% endblock
+%} {% block extra_head %}
+<style>
+  .auth-container {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: var(--bg-secondary);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  .auth-header {
+    padding: 2.5rem 2rem 0;
+    text-align: center;
+  }
+
+  .auth-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  }
+
+  .auth-icon i {
+    font-size: 2rem;
+    color: white;
+  }
+
+  .auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .auth-form {
+    padding: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .form-label i {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .input-wrapper .input {
+    padding-right: 3rem;
+  }
+
+  .input-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    transition: color var(--transition-fast);
+  }
+
+  .input-toggle:hover {
+    color: var(--text-primary);
+  }
+
+  .form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  .checkbox-label input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-primary);
+  }
+
+  .forgot-link {
+    font-size: 0.875rem;
+    color: var(--accent-primary);
+    font-weight: 500;
+  }
+
+  .auth-btn {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .auth-btn .spinner {
+    display: none;
+    margin-left: 0.5rem;
+  }
+
+  .auth-btn.loading .spinner {
+    display: inline-block;
+  }
+
+  .auth-btn.loading .btn-text {
+    opacity: 0.7;
+  }
+
+  .auth-divider {
+    padding: 0 2rem;
+    text-align: center;
+  }
+
+  .auth-divider p {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .auth-divider a {
+    font-weight: 600;
+  }
+
+  .demo-banner {
+    margin: 0 2rem 2rem;
+    padding: 1rem 1.25rem;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .demo-banner:hover {
+    border-color: var(--accent-primary);
+    background: rgba(37, 99, 235, 0.12);
+  }
+
+  .demo-banner-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .demo-banner-text {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  .demo-banner-text strong {
+    color: var(--text-primary);
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="auth-container">
+  <div class="auth-card fade-in">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <i class="fas fa-user"></i>
+      </div>
+      <h1 class="auth-title">Welcome Back</h1>
+      <p class="auth-subtitle">Sign in to your Legal AI account</p>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-user"></i>
+          Username
+        </label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="input"
+          placeholder="Enter your username"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-lock"></i>
+          Password
+        </label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="input"
+            placeholder="Enter your password"
+            required
+          />
+          <button type="button" class="input-toggle" id="toggle-password">
+            <i class="fas fa-eye" id="password-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <label class="checkbox-label">
+          <input type="checkbox" name="remember" />
+          Remember me
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button type="submit" id="login-btn" class="btn btn-primary auth-btn">
+        <span class="btn-text">
+          <i class="fas fa-sign-in-alt"></i>
+          Sign In
+        </span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+
+    <div class="auth-divider">
+      <p>
+        Don't have an account?
+        <a href="{{ url_for('auth.signup') }}">Sign up here</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById("login-form");
+    const loginBtn = document.getElementById("login-btn");
+    const togglePassword = document.getElementById("toggle-password");
+    const passwordInput = document.getElementById("password");
+    const passwordIcon = document.getElementById("password-icon");
+    const demoFill = document.getElementById("demo-fill");
+
+    togglePassword.addEventListener("click", function () {
+      const type =
+        passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      passwordIcon.classList.toggle("fa-eye");
+      passwordIcon.classList.toggle("fa-eye-slash");
+    });
+
+    if (demoFill) {
+      demoFill.addEventListener("click", function () {
+        document.getElementById("username").value = "demo";
+        document.getElementById("password").value = "demo123";
+        showToast("Demo credentials filled!", "success");
+      });
+    }
+
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      loginBtn.classList.add("loading");
+      loginBtn.disabled = true;
+
+      const formData = new FormData(loginForm);
+      const data = {
+        username: formData.get("username"),
+        password: formData.get("password"),
+      };
+
+      fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            showToast("Login successful! Redirecting...", "success");
+            setTimeout(() => {
+              window.location.href = data.redirect || "/chat";
+            }, 1000);
+          } else {
+            showToast(data.error || "Login failed", "error");
+            resetButton();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          showToast("An error occurred during login", "error");
+          resetButton();
+        });
+    });
+
+    function resetButton() {
+      loginBtn.classList.remove("loading");
+      loginBtn.disabled = false;
+    }
+  });
+</script>
+{% endblock %}

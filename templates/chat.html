@@ -1,0 +1,1590 @@
+{% extends "base.html" %} {% block title %}Chat - Legal AI{% endblock %} {%
+block navbar %}{% endblock %} {% block extra_head %}
+<style>
+  .chat-layout {
+    display: flex;
+    height: 100vh;
+    background: var(--bg-secondary);
+  }
+  .sidebar {
+    width: 260px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  .sidebar-brand i {
+    color: var(--accent-primary);
+  }
+  .new-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--accent-primary);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  .sidebar-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+  .history-item:hover {
+    background: var(--bg-tertiary);
+  }
+  .history-item i {
+    color: var(--text-muted);
+  }
+  .sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+  .user-actions button,
+  .user-actions a {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .user-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .main-header {
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .main-header h1 {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .main-nav a {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-left: 1.5rem;
+  }
+  .msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+  .msgs-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .welcome {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+  .welcome-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--accent-primary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .welcome-icon i {
+    font-size: 2rem;
+    color: #fff;
+  }
+  .welcome h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .welcome p {
+    color: var(--text-secondary);
+  }
+  .msg {
+    margin-bottom: 1.5rem;
+  }
+  .msg-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .msg.user .msg-avatar {
+    background: var(--accent-primary);
+    color: #fff;
+  }
+  .msg.assistant .msg-avatar {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+  }
+  .msg-sender {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  .msg-content {
+    padding-left: 2.5rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+  .msg-content p {
+    margin-bottom: 1rem;
+  }
+  .msg-content strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .msg-content h1,
+  .msg-content h2,
+  .msg-content h3,
+  .msg-content h4 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+  .msg-content h2 {
+    font-size: 1.05rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.35rem;
+  }
+  .msg-content h3 {
+    font-size: 0.975rem;
+  }
+  .msg-content ul,
+  .msg-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 0.25rem;
+  }
+  .msg-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.75;
+  }
+  .msg-content li + li {
+    margin-top: 0.25rem;
+  }
+  .msg-content code {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+    font-size: 0.875em;
+    font-family: 'Courier New', monospace;
+    color: var(--accent-primary);
+  }
+  .msg-content pre {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .msg-content pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+  }
+  .msg-content blockquote {
+    border-left: 3px solid var(--accent-primary);
+    padding: 0.5rem 0 0.5rem 1rem;
+    margin: 1rem 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .msg-content hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 1.5rem 0;
+  }
+  .msg-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+  .msg-content th,
+  .msg-content td {
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+  .msg-content th {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .msg-content > *:first-child {
+    margin-top: 0;
+  }
+  .msg-content > *:last-child {
+    margin-bottom: 0;
+  }
+  .msg-actions {
+    padding-left: 2.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.75rem;
+  }
+  .msg-actions button {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+  }
+  .msg-actions button:hover {
+    color: var(--accent-primary);
+    background: var(--bg-tertiary);
+  }
+  .msg-actions button.tts-loading {
+    color: var(--text-muted);
+    cursor: default;
+  }
+  .msg-actions button.tts-loading:hover {
+    background: none;
+  }
+  .typing span {
+    width: 8px;
+    height: 8px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: type 1s infinite;
+  }
+  .typing span:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .typing span:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  @keyframes type {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-8px);
+    }
+  }
+  /* Skeleton loading animation */
+  .skeleton-loading {
+    padding-left: 2.5rem;
+  }
+  .skeleton-line {
+    height: 14px;
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 25%,
+      var(--border-color) 50%,
+      var(--bg-tertiary) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .skeleton-line:nth-child(1) {
+    width: 90%;
+  }
+  .skeleton-line:nth-child(2) {
+    width: 75%;
+  }
+  .skeleton-line:nth-child(3) {
+    width: 85%;
+  }
+  .skeleton-line:nth-child(4) {
+    width: 60%;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  .input-area {
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+  }
+  .input-wrap {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .input-box {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+  .input-field {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-primary);
+    transition: border-color 0.2s;
+  }
+  .input-field:focus-within {
+    border-color: var(--accent-primary);
+  }
+  .input-field textarea {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    padding-right: 48px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    resize: none;
+    min-height: 52px;
+    max-height: 150px;
+    outline: none;
+  }
+  .mic-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .mic-btn:hover {
+    background: var(--accent-primary);
+    color: white;
+  }
+  .mic-btn.active {
+    background: var(--error);
+    color: white;
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+  /* Attached file chip */
+  .attached-file {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+  .attached-file.show {
+    display: flex;
+  }
+  .attached-file i {
+    color: var(--accent-primary);
+  }
+  .attached-file .file-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-secondary);
+  }
+  .attached-file .remove-file {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+  }
+  .attached-file .remove-file:hover {
+    background: var(--error);
+    color: white;
+  }
+  .send-btn {
+    height: 52px;
+    width: 52px;
+    border-radius: var(--radius-lg);
+    background: var(--accent-primary);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .send-btn:disabled {
+    opacity: 0.5;
+  }
+  .opts {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tools {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .tool {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .tool:hover,
+  .tool.active {
+    background: var(--accent-primary);
+    color: #fff;
+  }
+  .tool-sel {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+  .hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  .modal-bg.show {
+    display: flex;
+  }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-head {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-head h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .modal-close {
+    background: var(--bg-tertiary);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+  }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+  .modal-foot {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    text-align: right;
+  }
+  .search-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .search-row .input {
+    flex: 1;
+  }
+  .case {
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+  .case:hover {
+    border-color: var(--accent-primary);
+  }
+  .case-name {
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 0.25rem;
+  }
+  .case-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+  .case-sum {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+  .case-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+  }
+  audio {
+    display: none;
+  }
+  /* Audio Control Bar */
+  .audio-controls {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1.5rem;
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow-xl);
+    z-index: 100;
+  }
+  .audio-controls.show {
+    display: flex;
+  }
+  .audio-controls span {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .audio-controls button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.15s;
+  }
+  .audio-controls .play-btn {
+    background: var(--accent-primary);
+    color: white;
+  }
+  .audio-controls .play-btn:hover {
+    transform: scale(1.1);
+  }
+  .audio-controls .stop-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+  }
+  .audio-controls .stop-btn:hover {
+    background: var(--error);
+    color: white;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="chat-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="{{url_for('main.index')}}" class="sidebar-brand"
+        ><i class="fas fa-scale-balanced"></i><span>Legal AI</span></a
+      >
+      <button class="new-btn" id="new-btn">
+        <i class="fas fa-plus"></i> New Chat
+      </button>
+    </div>
+    <div class="sidebar-content">
+      <p class="sidebar-label">Recent</p>
+      <div id="history"></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">{{current_user.username[0]|upper}}</div>
+        <span style="font-size: 0.875rem">{{current_user.username}}</span>
+      </div>
+      <div class="user-actions">
+        <button onclick="toggleTheme()">
+          <i class="fas fa-moon" id="theme-icon"></i></button
+        ><a href="{{url_for('auth.logout')}}"
+          ><i class="fas fa-sign-out-alt"></i
+        ></a>
+      </div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="main-header">
+      <h1>Chat</h1>
+      <nav class="main-nav">
+        <a href="{{url_for('main.index')}}">Home</a>
+      </nav>
+    </header>
+    <div class="msgs" id="msgs">
+      <div class="msgs-inner" id="msgs-inner">
+        <div class="welcome">
+          <div class="welcome-icon"><i class="fas fa-scale-balanced"></i></div>
+          <h2>How can I help?</h2>
+          <p>Ask about Indian law or upload documents</p>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-wrap">
+        <div class="input-box">
+          <div class="input-field">
+            <textarea
+              id="input"
+              placeholder="Type your question..."
+              rows="1"
+            ></textarea>
+            <button class="mic-btn" id="mic-btn" title="Voice Input">
+              <i class="fas fa-microphone" id="mic-icon"></i>
+            </button>
+          </div>
+          <button class="send-btn" id="send" disabled>
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+
+        <div class="attached-file" id="attached-file">
+          <i class="fas fa-file-pdf"></i>
+          <span class="file-name" id="attached-file-name">document.pdf</span>
+          <button class="remove-file" id="remove-file" title="Remove">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="opts">
+          <div class="tools">
+            <button class="tool" id="upload-btn">
+              <i class="fas fa-paperclip"></i>Upload</button
+            ><button class="tool" id="prec-btn">
+              <i class="fas fa-gavel"></i>Precedents:<span id="prec-st"
+                >OFF</span
+              ></button
+            ><button class="tool" id="case-btn">
+              <i class="fas fa-book"></i>Cases</button
+            ><button class="tool" id="audio-btn">
+              <i class="fas fa-volume-up"></i>Audio:<span id="audio-st"
+                >ON</span
+              ></button
+            ><select class="tool-sel" id="lang">
+              <option value="english">EN</option>
+              <option value="hindi">HI</option>
+              <option value="tamil">TA</option>
+            </select>
+          </div>
+          <span class="hint">Shift+Enter for new line</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="modal-bg" id="cases-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Indian Cases</h3>
+      <button class="modal-close" id="close-cases">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-row">
+        <input class="input" id="case-q" placeholder="Search..." /><select
+          class="input"
+          id="case-area"
+          style="width: auto"
+        >
+          <option value="">All</option>
+          <option value="Constitutional Law">Constitutional</option>
+          <option value="Criminal Law">Criminal</option>
+          <option value="Civil Rights">Civil Rights</option>
+          <option value="Family Law">Family</option></select
+        ><button class="btn btn-primary" id="search-btn">Search</button>
+      </div>
+      <div id="cases"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" id="close-cases-btn">Close</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="upload-modal">
+  <div class="modal" style="max-width: 450px">
+    <div class="modal-head">
+      <h3>Upload Document</h3>
+      <button class="modal-close" id="close-upload">&times;</button>
+    </div>
+    <div class="modal-body" style="text-align: center; padding: 2rem">
+      <input
+        type="file"
+        id="file"
+        style="display: none"
+        accept=".pdf,.docx,.txt"
+      />
+      <div class="welcome-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+      <p style="margin: 1.5rem 0; color: var(--text-secondary)">
+        Select a document to analyze
+      </p>
+      <button class="btn btn-primary" id="browse-btn">
+        <i class="fas fa-folder-open"></i>Choose File
+      </button>
+      <p style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted)">
+        PDF, DOCX, TXT up to 16MB
+      </p>
+    </div>
+  </div>
+</div>
+<audio id="audio"></audio>
+<div class="audio-controls" id="audio-controls">
+  <span id="audio-status">Playing...</span>
+  <button class="play-btn" id="audio-play" title="Pause/Resume">
+    <i class="fas fa-pause" id="play-icon"></i>
+  </button>
+  <button class="stop-btn" id="audio-stop" title="Stop">
+    <i class="fas fa-stop"></i>
+  </button>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  let chatId = null,
+    audioOn = true,
+    precOn = false,
+    store = {},
+    cnt = 0,
+    es = null,
+    attachedDocId = null;
+  const $ = (id) => document.getElementById(id);
+  document.addEventListener("DOMContentLoaded", () => {
+    setup();
+    loadHist();
+    events();
+
+    // Remove attached file button
+    $("remove-file").onclick = () => {
+      attachedDocId = null;
+      $("attached-file").classList.remove("show");
+      showToast("File removed", "info");
+    };
+  });
+  function setup() {
+    const i = $("input"),
+      b = $("send");
+    i.oninput = function () {
+      this.style.height = "auto";
+      this.style.height = Math.min(this.scrollHeight, 150) + "px";
+      b.disabled = !this.value.trim();
+    };
+    i.onkeydown = function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        if (this.value.trim()) send();
+      }
+    };
+  }
+  function events() {
+    $("send").onclick = send;
+    $("new-btn").onclick = newChat;
+    $("audio-btn").onclick = () => {
+      audioOn = !audioOn;
+      $("audio-st").textContent = audioOn ? "ON" : "OFF";
+      $("audio-btn").classList.toggle("active", audioOn);
+    };
+    $("prec-btn").onclick = () => {
+      precOn = !precOn;
+      $("prec-st").textContent = precOn ? "ON" : "OFF";
+      $("prec-btn").classList.toggle("active", precOn);
+    };
+    $("upload-btn").onclick = () => $("upload-modal").classList.add("show");
+    $("close-upload").onclick = () =>
+      $("upload-modal").classList.remove("show");
+    $("browse-btn").onclick = () => $("file").click();
+    $("file").onchange = handleFile;
+    $("case-btn").onclick = () => {
+      $("cases-modal").classList.add("show");
+      loadCases();
+    };
+    $("close-cases").onclick = $("close-cases-btn").onclick = () =>
+      $("cases-modal").classList.remove("show");
+    $("search-btn").onclick = searchCases;
+    $("case-q").onkeypress = (e) => {
+      if (e.key === "Enter") searchCases();
+    };
+
+    // Audio control handlers
+    $("audio-play").onclick = toggleAudioPlay;
+    $("audio-stop").onclick = stopAudio;
+
+    // Audio element events
+    const audio = $("audio");
+    audio.onplay = () => showAudioControls("Playing...");
+    audio.onpause = () => updatePlayIcon(true);
+    audio.onended = hideAudioControls;
+
+    // Voice input handler (mic button in input box)
+    $("mic-btn").onclick = startVoiceInput;
+  }
+
+  // Voice Input using Web Speech API
+  let recognition = null;
+  let isListening = false;
+
+  function startVoiceInput() {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      showToast("Voice input not supported in this browser", "error");
+      return;
+    }
+
+    if (isListening) {
+      // Stop listening - set flag first to prevent auto-restart
+      isListening = false;
+      if (recognition) recognition.stop();
+      $("mic-btn").classList.remove("active");
+      $("mic-icon").className = "fas fa-microphone";
+      showToast("Voice stopped", "info");
+      return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang =
+      $("lang").value === "hindi"
+        ? "hi-IN"
+        : $("lang").value === "tamil"
+        ? "ta-IN"
+        : "en-IN";
+    recognition.continuous = true; // Enable continuous listening
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isListening = true;
+      $("mic-btn").classList.add("active");
+      $("mic-icon").className = "fas fa-stop";
+      showToast("Listening... Click mic again to stop", "info");
+    };
+
+    recognition.onresult = (e) => {
+      let finalTranscript = "";
+      let interimTranscript = "";
+
+      for (let i = 0; i < e.results.length; i++) {
+        const result = e.results[i];
+        if (result.isFinal) {
+          finalTranscript += result[0].transcript + " ";
+        } else {
+          interimTranscript += result[0].transcript;
+        }
+      }
+
+      $("input").value = finalTranscript + interimTranscript;
+      $("send").disabled = !$("input").value.trim();
+    };
+
+    recognition.onend = () => {
+      // Restart if still listening (browser auto-stops after silence)
+      if (isListening) {
+        try {
+          recognition.start();
+        } catch (e) {
+          isListening = false;
+          $("mic-btn").classList.remove("active");
+          $("mic-icon").className = "fas fa-microphone";
+          if ($("input").value.trim()) {
+            showToast("Voice captured!", "success");
+          }
+        }
+      } else {
+        $("mic-btn").classList.remove("active");
+        $("mic-icon").className = "fas fa-microphone";
+        if ($("input").value.trim()) {
+          showToast("Voice captured!", "success");
+        }
+      }
+    };
+
+    recognition.onerror = (e) => {
+      isListening = false;
+      $("mic-btn").classList.remove("active");
+      $("mic-icon").className = "fas fa-microphone";
+      if (e.error === "no-speech") {
+        showToast("No speech detected", "info");
+      } else {
+        showToast("Voice error: " + e.error, "error");
+      }
+    };
+
+    recognition.start();
+  }
+  function send() {
+    const i = $("input"),
+      m = i.value.trim();
+    if (!m) return;
+    i.value = "";
+    i.style.height = "auto";
+    $("send").disabled = true;
+
+    // Show file reference in message if attached
+    let displayMsg = m;
+    if (attachedDocId) {
+      const fileName = $("attached-file-name").textContent;
+      displayMsg = `📎 ${fileName}\n\n${m}`;
+    }
+    addMsg(displayMsg, true);
+
+    fetch("/chat/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: m,
+        chat_id: chatId,
+        language: "english",
+        enable_precedents: precOn,
+        ttsLanguage: $("lang").value,
+        document_id: attachedDocId,
+      }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          chatId = d.chat_id;
+          // Clear attachment after sending
+          attachedDocId = null;
+          $("attached-file").classList.remove("show");
+          stream(d.stream_url);
+        } else {
+          addMsg("Error: " + (d.error || "Failed"), false);
+          $("send").disabled = false;
+        }
+      })
+      .catch(() => {
+        addMsg("Connection error", false);
+        $("send").disabled = false;
+      });
+  }
+  function stream(url) {
+    if (es) es.close();
+    const t = addTyping();
+    es = new EventSource(url);
+    let r = "";
+    es.onmessage = (e) => {
+      const d = JSON.parse(e.data);
+      if (d.type === "status") {
+        // Show status message (Generating.../Translating...)
+        const statusDiv =
+          t.querySelector(".typing") || t.querySelector(".msg-content");
+        if (statusDiv) {
+          statusDiv.innerHTML = `<div style="color:var(--accent-primary)"><i class="fas fa-spinner fa-spin"></i> ${d.message}</div>`;
+        }
+      } else if (d.type === "token") {
+        r += d.content;
+        updateTyping(t, r);
+      } else if (d.type === "complete") {
+        t.remove();
+        // For non-English, r already contains translated text
+        addMsg(r, false);
+        es.close();
+        $("send").disabled = false;
+        loadHist();
+      } else if (d.type === "error") {
+        t.remove();
+        addMsg("Error: " + d.message, false);
+        es.close();
+        $("send").disabled = false;
+      }
+    };
+    es.onerror = () => {
+      t.remove();
+      addMsg("Connection lost", false);
+      es.close();
+      $("send").disabled = false;
+    };
+  }
+  function addMsg(c, isU) {
+    const w = $("msgs-inner"),
+      wel = w.querySelector(".welcome");
+    if (wel) wel.remove();
+
+    // Ensure content is a string
+    const content = c || "";
+
+    const d = document.createElement("div");
+    d.className = "msg " + (isU ? "user" : "assistant");
+
+    let tts = "";
+    if (!isU && content) {
+      const id = "m" + cnt++;
+      store[id] = content;
+      // Get selected language
+      const selectedLang = $("lang").value;
+      const langLabel =
+        selectedLang === "hindi"
+          ? "HI"
+          : selectedLang === "tamil"
+          ? "TA"
+          : "EN";
+
+      // Show skeleton loading for audio button initially
+      tts = `<div class="msg-actions" id="tts-area-${id}">
+        <div class="skeleton-line" style="width:80px;height:20px;margin:0"></div>
+      </div>`;
+
+      // After short delay, replace with actual button
+      setTimeout(() => {
+        const area = document.getElementById("tts-area-" + id);
+        if (area) {
+          area.innerHTML = `<button onclick="tts('${id}','${selectedLang}')">
+            <i class="fas fa-play"></i> Play ${langLabel}
+          </button>`;
+        }
+      }, 500);
+    }
+
+    d.innerHTML = `<div class="msg-header"><div class="msg-avatar"><i class="fas ${
+      isU ? "fa-user" : "fa-robot"
+    }"></i></div><span class="msg-sender">${
+      isU ? "You" : "Legal AI"
+    }</span></div><div class="msg-content">${
+      isU ? content.replace(/\n/g, "<br>") : marked.parse(content)
+    }</div>${tts}`;
+    w.appendChild(d);
+    $("msgs").scrollTop = $("msgs").scrollHeight;
+  }
+  function addTyping() {
+    const w = $("msgs-inner"),
+      d = document.createElement("div");
+    d.className = "msg assistant";
+    d.id = "typ";
+    d.innerHTML = `
+      <div class="msg-header">
+        <div class="msg-avatar"><i class="fas fa-robot"></i></div>
+        <span class="msg-sender">Legal AI</span>
+      </div>
+      <div class="skeleton-loading">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line"></div>
+      </div>`;
+    w.appendChild(d);
+    $("msgs").scrollTop = $("msgs").scrollHeight;
+    return d;
+  }
+  function updateTyping(el, c) {
+    // Remove skeleton loading or typing indicator
+    const skeleton = el.querySelector(".skeleton-loading");
+    if (skeleton) skeleton.remove();
+    const t = el.querySelector(".typing");
+    if (t) t.remove();
+
+    let cd = el.querySelector(".msg-content");
+    if (!cd) {
+      cd = document.createElement("div");
+      cd.className = "msg-content";
+      el.appendChild(cd);
+    }
+    cd.innerHTML = marked.parse(c);
+    $("msgs").scrollTop = $("msgs").scrollHeight;
+  }
+  function loadHist() {
+    fetch("/chat/history")
+      .then((r) => r.json())
+      .then((d) => {
+        const h = $("history");
+        h.innerHTML = "";
+        d.chats.forEach((c) => {
+          const i = document.createElement("div");
+          i.className = "history-item";
+          i.innerHTML = `<i class="fas fa-message"></i><span>${c.title}</span>`;
+          i.onclick = () => loadChat(c.id);
+          h.appendChild(i);
+        });
+      });
+  }
+  function loadChat(id) {
+    fetch(`/chat/${id}/messages`)
+      .then((r) => r.json())
+      .then((d) => {
+        chatId = id;
+        $("msgs-inner").innerHTML = "";
+        d.messages.forEach((m) => addMsg(m.content, m.is_user));
+      });
+  }
+  function newChat() {
+    chatId = null;
+    $("msgs-inner").innerHTML =
+      '<div class="welcome"><div class="welcome-icon"><i class="fas fa-scale-balanced"></i></div><h2>How can I help?</h2><p>Ask about Indian law or upload documents</p></div>';
+  }
+  // Split text into sentences for chunked processing
+  function splitIntoChunks(text, maxLen = 200) {
+    const sentences = text.split(/(?<=[.!?\n])\s+/);
+    const chunks = [];
+    let current = "";
+
+    for (const s of sentences) {
+      if ((current + s).length < maxLen) {
+        current += (current ? " " : "") + s;
+      } else {
+        if (current) chunks.push(current);
+        current = s;
+      }
+    }
+    if (current) chunks.push(current);
+    return chunks.length ? chunks : [text];
+  }
+
+  // Preload TTS audio and update button
+  async function preloadTTS(id, lang) {
+    const text = store[id];
+    if (!text) return;
+
+    const btn = document.getElementById("tts-" + id);
+    if (!btn) return;
+
+    // Clean text
+    const cleanText = text
+      .replace(/<[^>]*>/g, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/#{1,6}\s*/g, "")
+      .replace(/\n+/g, ". ")
+      .trim();
+
+    const langLabel = lang === "hindi" ? "HI" : lang === "tamil" ? "TA" : "EN";
+
+    try {
+      // Generate first chunk only for quick button update
+      const res = await fetch("/tts/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: cleanText.slice(0, 200),
+          ttsLanguage: lang,
+        }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        // Update button to show ready state
+        btn.innerHTML = `<i class="fas fa-play"></i> Play ${langLabel}`;
+        btn.classList.remove("tts-loading");
+      } else {
+        btn.innerHTML = `<i class="fas fa-volume-up"></i> ${langLabel}`;
+        btn.classList.remove("tts-loading");
+      }
+    } catch (e) {
+      // On error, still show play button
+      btn.innerHTML = `<i class="fas fa-volume-up"></i> ${langLabel}`;
+      btn.classList.remove("tts-loading");
+    }
+  }
+
+  function tts(id, lang) {
+    if (!audioOn) return;
+    const t = store[id];
+    if (!t) {
+      showToast("No content to speak", "error");
+      return;
+    }
+
+    // Stop any currently speaking
+    speechSynthesis.cancel();
+    if (window.audioQueue) window.audioQueue = [];
+
+    // Clean text - remove HTML tags and markdown
+    const cleanText = t
+      .replace(/<[^>]*>/g, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/\*(.*?)\*/g, "$1")
+      .replace(/#{1,6}\s*/g, "")
+      .replace(/\n+/g, ". ")
+      .trim();
+
+    if (!cleanText) {
+      showToast("No content to speak", "error");
+      return;
+    }
+
+    // English: Browser TTS with chunked sentences (instant)
+    if (lang === "english") {
+      const chunks = splitIntoChunks(cleanText);
+      showAudioControls("Speaking English...");
+
+      chunks.forEach((chunk, i) => {
+        const utterance = new SpeechSynthesisUtterance(chunk);
+        utterance.lang = "en-IN";
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+
+        const voices = speechSynthesis.getVoices();
+        const voice =
+          voices.find((v) => v.lang.includes("en") && v.lang.includes("IN")) ||
+          voices.find((v) => v.lang.startsWith("en"));
+        if (voice) utterance.voice = voice;
+
+        if (i === chunks.length - 1) {
+          utterance.onend = () => {
+            hideAudioControls();
+            showToast("Done speaking", "success");
+          };
+        }
+
+        speechSynthesis.speak(utterance);
+      });
+    } else {
+      // Hindi/Tamil: Sequential processing for streaming playback
+      const langLabel = lang === "hindi" ? "Hindi" : "Tamil";
+      const chunks = splitIntoChunks(cleanText, 150);
+
+      showAudioControls("Processing " + langLabel + "...");
+
+      let currentIndex = 0;
+      let isPlaying = false;
+      let nextReady = null; // Pre-fetched next chunk
+      const audio = $("audio");
+
+      // Process and play one chunk, pre-fetch the next
+      async function processChunk(index) {
+        if (index >= chunks.length) {
+          // All done
+          if (!isPlaying) {
+            hideAudioControls();
+            showToast("Done playing " + langLabel, "success");
+          }
+          return;
+        }
+
+        $("audio-status").textContent =
+          "Processing part " + (index + 1) + "/" + chunks.length + "...";
+
+        try {
+          const res = await fetch("/tts/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: chunks[index], ttsLanguage: lang }),
+          });
+          const data = await res.json();
+
+          if (data.success && data.audio_file) {
+            const audioUrl = "/" + data.audio_file;
+
+            if (!isPlaying) {
+              // First chunk - play immediately
+              isPlaying = true;
+              audio.src = audioUrl;
+              audio.play();
+              $("audio-status").textContent =
+                "Playing " +
+                langLabel +
+                " (" +
+                (index + 1) +
+                "/" +
+                chunks.length +
+                ")";
+
+              // Pre-fetch next chunk while this plays
+              if (index + 1 < chunks.length) {
+                processChunk(index + 1);
+              }
+            } else {
+              // Store for when current finishes
+              nextReady = audioUrl;
+            }
+          } else {
+            // Skip failed chunk, try next
+            processChunk(index + 1);
+          }
+        } catch (e) {
+          // Skip failed chunk
+          processChunk(index + 1);
+        }
+      }
+
+      // When current audio ends, play next
+      audio.onended = () => {
+        currentIndex++;
+        if (nextReady) {
+          audio.src = nextReady;
+          audio.play();
+          $("audio-status").textContent =
+            "Playing " +
+            langLabel +
+            " (" +
+            (currentIndex + 1) +
+            "/" +
+            chunks.length +
+            ")";
+          nextReady = null;
+          // Pre-fetch the one after
+          if (currentIndex + 1 < chunks.length) {
+            processChunk(currentIndex + 1);
+          }
+        } else if (currentIndex >= chunks.length) {
+          hideAudioControls();
+          showToast("Done playing " + langLabel, "success");
+          isPlaying = false;
+        } else {
+          // Next not ready yet, wait for it
+          $("audio-status").textContent = "Buffering...";
+        }
+      };
+
+      // Start processing first chunk
+      processChunk(0);
+    }
+  }
+
+  // Pre-load voices on page load
+  speechSynthesis.getVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+  }
+
+  // Audio control functions
+  function showAudioControls(status) {
+    $("audio-controls").classList.add("show");
+    $("audio-status").textContent = status || "Playing...";
+    updatePlayIcon(false);
+  }
+
+  function hideAudioControls() {
+    $("audio-controls").classList.remove("show");
+    window.audioQueue = [];
+  }
+
+  function updatePlayIcon(paused) {
+    $("play-icon").className = paused ? "fas fa-play" : "fas fa-pause";
+  }
+
+  function toggleAudioPlay() {
+    const audio = $("audio");
+    if (speechSynthesis.speaking) {
+      // Browser TTS
+      if (speechSynthesis.paused) {
+        speechSynthesis.resume();
+        updatePlayIcon(false);
+        $("audio-status").textContent = "Playing...";
+      } else {
+        speechSynthesis.pause();
+        updatePlayIcon(true);
+        $("audio-status").textContent = "Paused";
+      }
+    } else if (audio.src) {
+      // Server audio
+      if (audio.paused) {
+        audio.play();
+        updatePlayIcon(false);
+        $("audio-status").textContent = "Playing...";
+      } else {
+        audio.pause();
+        updatePlayIcon(true);
+        $("audio-status").textContent = "Paused";
+      }
+    }
+  }
+
+  function stopAudio() {
+    speechSynthesis.cancel();
+    const audio = $("audio");
+    audio.pause();
+    audio.currentTime = 0;
+    window.audioQueue = [];
+    hideAudioControls();
+    showToast("Audio stopped", "info");
+  }
+  function handleFile(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    $("upload-modal").classList.remove("show");
+
+    showToast("Uploading...", "info");
+
+    const fd = new FormData();
+    fd.append("file", f);
+    fetch("/document/upload", { method: "POST", body: fd })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          // Store the document ID and show the attached file chip
+          attachedDocId = d.document.id;
+          $("attached-file-name").textContent = d.document.original_filename;
+          $("attached-file").classList.add("show");
+
+          // Focus on input for user to type their question
+          $("input").focus();
+          $("input").placeholder = "Ask about this document...";
+
+          showToast("File attached! Type your question.", "success");
+        } else {
+          showToast(d.error || "Upload failed", "error");
+        }
+      })
+      .catch(() => {
+        showToast("Upload error", "error");
+      });
+    e.target.value = "";
+  }
+  function loadCases() {
+    fetch("/static/precedents.json")
+      .then((r) => r.json())
+      .then(showCases)
+      .catch(() => {
+        $("cases").innerHTML =
+          '<p style="color:var(--text-muted)">Error loading</p>';
+      });
+  }
+  function searchCases() {
+    const q = $("case-q").value.trim(),
+      a = $("case-area").value;
+    if (!q && !a) {
+      loadCases();
+      return;
+    }
+    fetch("/chat/precedents/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: q, legal_area: a || null, limit: 10 }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.precedents) showCases(d.precedents);
+        else $("cases").innerHTML = "<p>No results</p>";
+      });
+  }
+  function showCases(cs) {
+    const el = $("cases");
+    if (!cs || !cs.length) {
+      el.innerHTML = '<p style="color:var(--text-muted)">No cases</p>';
+      return;
+    }
+    el.innerHTML = cs
+      .map(
+        (c) =>
+          `<div class="case"><div class="case-name">${c.case_name}</div><div class="case-meta">${c.court}|${c.year}</div><div class="case-sum">${c.summary}</div><div class="case-tags"><span class="badge badge-primary">${c.legal_area}</span></div></div>`
+      )
+      .join("");
+  }
+</script>
+{% endblock %}

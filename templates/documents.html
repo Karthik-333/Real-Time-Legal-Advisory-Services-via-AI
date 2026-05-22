@@ -1,0 +1,517 @@
+{% extends "base.html" %} {% block title %}Documents - Legal AI{% endblock %} {%
+block extra_head %}
+<style>
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  .page-title h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+  .page-title p {
+    color: var(--text-secondary);
+  }
+  .upload-box {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    margin-bottom: 2rem;
+    background: var(--bg-card);
+  }
+  .upload-box:hover {
+    border-color: var(--accent-primary);
+  }
+  .upload-box.dragover {
+    border-color: var(--accent-primary);
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .upload-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .upload-icon i {
+    font-size: 2rem;
+    color: var(--accent-primary);
+  }
+  .upload-box:hover .upload-icon {
+    background: var(--accent-primary);
+  }
+  .upload-box:hover .upload-icon i {
+    color: #fff;
+  }
+  .upload-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .upload-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+  .upload-hint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 1rem;
+  }
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  .docs-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .doc-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all var(--transition-normal);
+  }
+  .doc-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-lg);
+  }
+  .doc-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .doc-icon i {
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+  }
+  .doc-icon.pdf i {
+    color: #ef4444;
+  }
+  .doc-icon.docx i {
+    color: #3b82f6;
+  }
+  .doc-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .doc-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .doc-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .doc-summary {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .doc-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+  }
+  .empty i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  .empty h3 {
+    margin-bottom: 0.5rem;
+  }
+  .empty p {
+    color: var(--text-secondary);
+  }
+  .loading {
+    text-align: center;
+    padding: 3rem;
+  }
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 1rem;
+  }
+  .modal-bg.show {
+    display: flex;
+  }
+  .modal {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+  }
+  .modal-head {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-head h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.25rem;
+  }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+  .modal-foot {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .detail-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+  }
+  .preview {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .preview pre {
+    white-space: pre-wrap;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-family: Consolas, monospace;
+  }
+  .progress-modal .modal {
+    max-width: 400px;
+    text-align: center;
+    padding: 2rem;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent-primary);
+    width: 0;
+    transition: width 0.3s;
+  }
+  @media (max-width: 640px) {
+    .doc-card {
+      flex-direction: column;
+    }
+    .doc-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">
+      <h1>Legal Documents</h1>
+      <p>Upload and analyze your legal documents</p>
+    </div>
+    <a href="{{url_for('main.chat')}}" class="btn btn-primary">Back to Chat</a>
+  </div>
+  <div class="upload-box" id="upload-box">
+    <input
+      type="file"
+      id="file"
+      style="display: none"
+      accept=".pdf,.docx,.txt"
+    />
+    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+    <h3 class="upload-title">Upload Document</h3>
+    <p class="upload-subtitle">Drag & drop or click to browse</p>
+    <button class="btn btn-primary" id="browse-btn">
+      <i class="fas fa-folder-open"></i>Browse Files
+    </button>
+    <p class="upload-hint">PDF, DOCX, TXT • Max 16MB</p>
+  </div>
+  <h2 class="section-title">Your Documents</h2>
+  <div id="docs-list" class="docs-grid"></div>
+  <div id="empty" class="empty" style="display: none">
+    <i class="fas fa-file-lines"></i>
+    <h3>No documents yet</h3>
+    <p>Upload your first document to get started</p>
+  </div>
+  <div id="loading" class="loading">
+    <div class="spinner" style="margin: 0 auto"></div>
+    <p style="margin-top: 1rem; color: var(--text-secondary)">
+      Loading documents...
+    </p>
+  </div>
+</div>
+<div class="modal-bg" id="detail-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Document Details</h3>
+      <button class="modal-close" id="close-modal">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" id="close-btn">Close</button
+      ><button class="btn btn-primary" id="ask-btn">
+        <i class="fas fa-question-circle"></i>Ask Question
+      </button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg progress-modal" id="progress-modal">
+  <div class="modal">
+    <i
+      class="fas fa-upload"
+      style="font-size: 2rem; color: var(--accent-primary)"
+    ></i>
+    <h3 style="margin: 1rem 0 0.5rem">Uploading</h3>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <p id="progress-text" style="color: var(--text-secondary)">Preparing...</p>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  let curId = null;
+  const $ = (id) => document.getElementById(id);
+  document.addEventListener("DOMContentLoaded", () => {
+    setupUpload();
+    loadDocs();
+    setupModal();
+  });
+  function setupUpload() {
+    const box = $("upload-box"),
+      inp = $("file"),
+      btn = $("browse-btn");
+    box.onclick = (e) => {
+      if (e.target !== btn && !btn.contains(e.target)) inp.click();
+    };
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      inp.click();
+    };
+    inp.onchange = handleUpload;
+    box.ondragover = (e) => {
+      e.preventDefault();
+      box.classList.add("dragover");
+    };
+    box.ondragleave = () => box.classList.remove("dragover");
+    box.ondrop = (e) => {
+      e.preventDefault();
+      box.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        inp.files = e.dataTransfer.files;
+        handleUpload({ target: { files: e.dataTransfer.files } });
+      }
+    };
+  }
+  function handleUpload(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    $("progress-modal").classList.add("show");
+    setProgress(20, "Uploading...");
+    const fd = new FormData();
+    fd.append("file", f);
+    fetch("/document/upload", { method: "POST", body: fd })
+      .then((r) => {
+        setProgress(60, "Processing...");
+        return r.json();
+      })
+      .then((d) => {
+        setProgress(100, "Done!");
+        setTimeout(() => {
+          $("progress-modal").classList.remove("show");
+          if (d.success) {
+            showToast("Document uploaded!", "success");
+            loadDocs();
+          } else showToast(d.error || "Failed", "error");
+        }, 500);
+      })
+      .catch(() => {
+        $("progress-modal").classList.remove("show");
+        showToast("Upload error", "error");
+      });
+    e.target.value = "";
+  }
+  function setProgress(p, t) {
+    $("progress-fill").style.width = p + "%";
+    $("progress-text").textContent = t;
+  }
+  function loadDocs() {
+    $("loading").style.display = "block";
+    $("empty").style.display = "none";
+    fetch("/document/list?page=1&per_page=20")
+      .then((r) => r.json())
+      .then((d) => {
+        $("loading").style.display = "none";
+        const list = $("docs-list");
+        list.innerHTML = "";
+        if (d.documents && d.documents.length) {
+          d.documents.forEach((doc) => list.appendChild(createDocCard(doc)));
+        } else $("empty").style.display = "block";
+      })
+      .catch(() => {
+        $("loading").style.display = "none";
+        showToast("Failed to load", "error");
+      });
+  }
+  function createDocCard(doc) {
+    const card = document.createElement("div");
+    card.className = "doc-card";
+    const iconClass =
+      doc.file_type === "pdf" ? "pdf" : doc.file_type === "docx" ? "docx" : "";
+    const icon =
+      doc.file_type === "pdf"
+        ? "fa-file-pdf"
+        : doc.file_type === "docx"
+        ? "fa-file-word"
+        : "fa-file-lines";
+    card.innerHTML = `<div class="doc-icon ${iconClass}"><i class="fas ${icon}"></i></div><div class="doc-info"><div class="doc-name">${
+      doc.original_filename
+    }</div><div class="doc-meta"><span>${formatFileSize(
+      doc.file_size
+    )}</span><span>•</span><span>${formatDate(
+      doc.uploaded_at
+    )}</span><span class="badge ${
+      doc.processed ? "badge-success" : "badge-primary"
+    }">${doc.processed ? "Processed" : "Processing"}</span></div>${
+      doc.summary ? `<p class="doc-summary">${doc.summary}</p>` : ""
+    }</div><div class="doc-actions"><button class="btn btn-secondary" onclick="viewDoc(${
+      doc.id
+    })"><i class="fas fa-eye"></i>View</button><button class="btn btn-danger" onclick="deleteDoc(${
+      doc.id
+    })"><i class="fas fa-trash"></i></button></div>`;
+    return card;
+  }
+  function viewDoc(id) {
+    curId = id;
+    fetch(`/document/${id}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.document) showDocModal(d.document, d.content);
+        else showToast("Failed to load", "error");
+      });
+  }
+  function showDocModal(doc, content) {
+    $("modal-title").textContent = doc.original_filename;
+    $(
+      "modal-body"
+    ).innerHTML = `<div class="detail-grid"><div class="detail-item"><label>Type</label><span>${
+      doc.document_type || "Unknown"
+    }</span></div><div class="detail-item"><label>Size</label><span>${formatFileSize(
+      doc.file_size
+    )}</span></div><div class="detail-item"><label>Uploaded</label><span>${formatDate(
+      doc.uploaded_at
+    )}</span></div><div class="detail-item"><label>Status</label><span>${
+      doc.processed ? "Processed" : "Processing"
+    }</span></div></div><div class="detail-item" style="margin-bottom:1.5rem"><label>AI Summary</label><p style="margin-top:.5rem;color:var(--text-secondary)">${
+      doc.summary || "Not available"
+    }</p></div><div class="detail-item"><label>Preview</label><div class="preview"><pre>${
+      content
+        ? content.substring(0, 2000) + (content.length > 2000 ? "..." : "")
+        : "Not available"
+    }</pre></div></div>`;
+    $("detail-modal").classList.add("show");
+  }
+  function setupModal() {
+    $("close-modal").onclick = $("close-btn").onclick = () =>
+      $("detail-modal").classList.remove("show");
+    $("ask-btn").onclick = () => {
+      if (curId) {
+        const q = prompt("What would you like to know?");
+        if (q)
+          location.href = `/chat?doc_id=${curId}&query=${encodeURIComponent(
+            q
+          )}`;
+      }
+    };
+  }
+  function deleteDoc(id) {
+    if (!confirm("Delete this document?")) return;
+    fetch(`/document/${id}`, { method: "DELETE" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) {
+          showToast("Deleted", "success");
+          loadDocs();
+        } else showToast("Failed", "error");
+      });
+  }
+</script>
+{% endblock %}

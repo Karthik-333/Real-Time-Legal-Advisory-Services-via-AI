@@ -1,0 +1,369 @@
+{% extends "base.html" %} {% block title %}Sign Up - Legal AI Assistant{%
+endblock %} {% block extra_head %}
+<style>
+  .auth-container {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: var(--bg-secondary);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+  }
+
+  .auth-header {
+    padding: 2rem 2rem 0;
+    text-align: center;
+  }
+
+  .auth-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  }
+
+  .auth-icon i {
+    font-size: 2rem;
+    color: white;
+  }
+
+  .auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .auth-form {
+    padding: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .form-label i {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .password-strength {
+    margin-top: 0.5rem;
+  }
+
+  .strength-bar {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all var(--transition-normal);
+    border-radius: 2px;
+  }
+
+  .strength-fill.weak {
+    background: var(--error);
+    width: 33%;
+  }
+  .strength-fill.medium {
+    background: var(--warning);
+    width: 66%;
+  }
+  .strength-fill.strong {
+    background: var(--success);
+    width: 100%;
+  }
+
+  .strength-text {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .terms-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--accent-primary);
+  }
+
+  .terms-checkbox span {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .terms-checkbox a {
+    color: var(--accent-primary);
+  }
+
+  .auth-btn {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .auth-divider {
+    padding: 0 2rem 2rem;
+    text-align: center;
+  }
+
+  .auth-divider p {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .auth-divider a {
+    font-weight: 600;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="auth-container">
+  <div class="auth-card fade-in">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle">Join Legal AI for free</p>
+    </div>
+
+    <form id="signup-form" class="auth-form">
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-user"></i>
+          Username
+        </label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="input"
+          placeholder="Choose a username"
+          required
+          minlength="3"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-envelope"></i>
+          Email Address
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="input"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-lock"></i>
+          Password
+        </label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="input"
+          placeholder="Create a password"
+          required
+          minlength="6"
+        />
+        <div class="password-strength">
+          <div class="strength-bar">
+            <div class="strength-fill" id="strength-fill"></div>
+          </div>
+          <p class="strength-text" id="strength-text">At least 6 characters</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-lock"></i>
+          Confirm Password
+        </label>
+        <input
+          type="password"
+          id="confirm-password"
+          name="confirm_password"
+          class="input"
+          placeholder="Confirm your password"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fas fa-language"></i>
+          Preferred Language
+        </label>
+        <select id="language" name="language" class="input">
+          <option value="english">English</option>
+          <option value="hindi">हिंदी (Hindi)</option>
+          <option value="tamil">தமிழ் (Tamil)</option>
+        </select>
+      </div>
+
+      <div class="terms-checkbox">
+        <input type="checkbox" id="terms" required />
+        <span>
+          I agree to the <a href="#">Terms of Service</a> and
+          <a href="#">Privacy Policy</a>
+        </span>
+      </div>
+
+      <button type="submit" id="signup-btn" class="btn btn-primary auth-btn">
+        <i class="fas fa-rocket"></i>
+        Create Account
+      </button>
+    </form>
+
+    <div class="auth-divider">
+      <p>
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}">Sign in here</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const signupForm = document.getElementById("signup-form");
+    const signupBtn = document.getElementById("signup-btn");
+    const passwordInput = document.getElementById("password");
+    const strengthFill = document.getElementById("strength-fill");
+    const strengthText = document.getElementById("strength-text");
+
+    passwordInput.addEventListener("input", function () {
+      const password = this.value;
+      let strength = 0;
+      let text = "At least 6 characters";
+
+      if (password.length >= 6) strength++;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+      strengthFill.className = "strength-fill";
+
+      if (strength >= 4) {
+        strengthFill.classList.add("strong");
+        text = "Strong password";
+      } else if (strength >= 2) {
+        strengthFill.classList.add("medium");
+        text = "Medium strength";
+      } else if (password.length > 0) {
+        strengthFill.classList.add("weak");
+        text = "Weak password";
+      }
+
+      strengthText.textContent = text;
+    });
+
+    signupForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+
+      if (password !== confirmPassword) {
+        showToast("Passwords do not match", "error");
+        return;
+      }
+
+      signupBtn.disabled = true;
+      signupBtn.innerHTML = '<span class="spinner"></span> Creating account...';
+
+      const formData = new FormData(signupForm);
+      const data = {
+        username: formData.get("username"),
+        email: formData.get("email"),
+        password: formData.get("password"),
+        confirm_password: formData.get("confirm_password"),
+        language: formData.get("language"),
+      };
+
+      fetch("/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            showToast("Account created successfully!", "success");
+            setTimeout(() => {
+              window.location.href = data.redirect || "/chat";
+            }, 1000);
+          } else {
+            showToast(data.error || "Registration failed", "error");
+            resetButton();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          showToast("An error occurred during registration", "error");
+          resetButton();
+        });
+    });
+
+    function resetButton() {
+      signupBtn.disabled = false;
+      signupBtn.innerHTML = '<i class="fas fa-rocket"></i> Create Account';
+    }
+  });
+</script>
+{% endblock %}

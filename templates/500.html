@@ -1,0 +1,58 @@
+{% extends "base.html" %} {% block title %}Server Error{% endblock %} {% block
+extra_head %}
+<style>
+  .error-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--bg-primary);
+  }
+  .error-content {
+    text-align: center;
+    max-width: 500px;
+  }
+  .error-code {
+    font-size: 8rem;
+    font-weight: 800;
+    color: var(--error);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .error-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+  .error-msg {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  .error-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="error-page">
+  <div class="error-content fade-in">
+    <div class="error-code">500</div>
+    <h1 class="error-title">Something Went Wrong</h1>
+    <p class="error-msg">
+      We're experiencing technical difficulties. Please try again later.
+    </p>
+    <div class="error-btns">
+      <a href="{{url_for('main.index')}}" class="btn btn-primary"
+        ><i class="fas fa-home"></i>Go Home</a
+      >
+      <button onclick="location.reload()" class="btn btn-secondary">
+        <i class="fas fa-refresh"></i>Try Again
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

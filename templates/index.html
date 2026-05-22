@@ -1,0 +1,295 @@
+{% extends "base.html" %} {% block title %}Legal AI Assistant - Indian Law
+Advisory{% endblock %} {% block extra_head %}
+<style>
+  .hero {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    background: var(--bg-primary);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(37, 99, 235, 0.03);
+    animation: float 20s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(-2%, -2%);
+    }
+  }
+
+  .hero-content {
+    max-width: 800px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .hero-icon i {
+    font-size: 3rem;
+    color: white;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-actions .btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
+
+  .features {
+    padding: 5rem 1.5rem;
+    background: var(--bg-secondary);
+  }
+
+  .features-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    transition: all var(--transition-normal);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--accent-primary);
+  }
+
+  .feature-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
+  }
+
+  .feature-card:hover .feature-icon {
+    background: var(--accent-primary);
+  }
+
+  .feature-icon i {
+    font-size: 1.75rem;
+    color: var(--accent-primary);
+    transition: color var(--transition-normal);
+  }
+
+  .feature-card:hover .feature-icon i {
+    color: white;
+  }
+
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+  }
+
+  .feature-desc {
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .demo-section {
+    padding: 4rem 1.5rem;
+    background: var(--bg-primary);
+  }
+
+  .demo-card {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: rgba(37, 99, 235, 0.05);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  .demo-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .demo-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .demo-credentials {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    font-family: "Consolas", monospace;
+    font-size: 0.9rem;
+  }
+
+  .demo-credentials span {
+    color: var(--text-secondary);
+  }
+
+  .demo-credentials strong {
+    color: var(--accent-primary);
+  }
+
+  .disclaimer {
+    padding: 2rem 1.5rem;
+    background: var(--bg-secondary);
+  }
+
+  .disclaimer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--warning);
+    border-radius: var(--radius-md);
+  }
+
+  .disclaimer-content i {
+    color: var(--warning);
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  .disclaimer-content p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .disclaimer-content strong {
+    color: var(--text-primary);
+  }
+
+  .footer {
+    padding: 2rem 1.5rem;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+  }
+
+  .footer p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+</style>
+{% endblock %} {% block content %}
+<section class="hero">
+  <div class="hero-content fade-in">
+    <h1 class="hero-title">
+      Your AI-Powered<br />
+      <span class="text-gradient">Legal Assistant</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Get instant legal guidance on Indian law. Analyze documents, search
+      landmark case precedents from the Supreme Court and High Courts, and
+      receive professional legal information.
+    </p>
+
+    <div class="hero-actions">
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('main.chat') }}" class="btn btn-primary">
+        Start Chatting
+      </a>
+      <a href="{{ url_for('main.documents') }}" class="btn btn-secondary">
+        Analyze Documents
+      </a>
+      {% else %}
+      <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">
+        <i class="fas fa-rocket"></i>
+        Get Started Free
+      </a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-secondary">
+        <i class="fas fa-sign-in-alt"></i>
+        Sign In
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 Legal AI Assistant.</p>
+</footer>
+{% endblock %}
