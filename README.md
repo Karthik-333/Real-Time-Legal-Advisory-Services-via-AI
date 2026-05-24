@@ -8,7 +8,6 @@
 [![Flask](https://img.shields.io/badge/Flask-2.3-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![Ollama](https://img.shields.io/badge/Ollama-LLM-FF6F00?style=for-the-badge&logo=ollama&logoColor=white)](https://ollama.com)
 [![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 A full-stack, real-time legal advisory web application that leverages Large Language Models (LLMs) to provide instant legal guidance on **Indian law**. Features include AI-powered chat with streaming responses, document analysis, multilingual support (English, Hindi, Tamil), text-to-speech, voice input, and a curated database of landmark Supreme Court precedents.
 
@@ -29,22 +28,17 @@ A full-stack, real-time legal advisory web application that leverages Large Lang
 ### Landing Page
 <img src="docs/screenshots/landing_page.png" alt="Landing Page" width="800"/>
 
-*Modern, responsive landing page with hero section and feature highlights*
+*Modern, responsive landing page with hero section and call-to-action buttons*
 
 ### AI Chat Interface
 <img src="docs/screenshots/chat_interface.png" alt="AI Chat Interface" width="800"/>
 
-*Real-time streaming AI chat with sidebar history, voice input, and precedent search*
+*Real-time AI chat with sidebar history, voice input, precedent search, and document upload*
 
-### Document Analysis
-<img src="docs/screenshots/document_analysis.png" alt="Document Analysis" width="800"/>
+### User Registration
+<img src="docs/screenshots/signup_page.png" alt="Sign Up Page" width="800"/>
 
-*Upload and analyze legal documents with AI-powered summarization and clause detection*
-
-### Authentication
-<img src="docs/screenshots/login_page.png" alt="Login Page" width="800"/>
-
-*Clean, secure authentication with dark/light theme support*
+*Secure registration with language preference selection and dark theme support*
 
 </div>
 
@@ -366,8 +360,7 @@ Real-Time Legal Advisory Services via AI/
     └── screenshots/                # Application screenshots
         ├── landing_page.png
         ├── chat_interface.png
-        ├── document_analysis.png
-        └── login_page.png
+        └── signup_page.png
 ```
 
 ---
@@ -641,12 +634,6 @@ Contributions are welcome! Here's how:
 3. **Commit** your changes: `git commit -m 'Add amazing feature'`
 4. **Push** to the branch: `git push origin feature/amazing-feature`
 5. **Open** a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
