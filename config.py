@@ -14,7 +14,7 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
     
     OLLAMA_API_URL = 'http://localhost:11434'
-    OLLAMA_MODEL = 'gpt-oss:120b-cloud'
+    OLLAMA_MODEL = 'llama3.2:latest'
     
     TTS_LANGUAGES = {
         'english': 'en',

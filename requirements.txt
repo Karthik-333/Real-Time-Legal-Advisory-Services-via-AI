@@ -10,3 +10,5 @@ gtts==2.3.2
 langdetect==1.0.9
 python-dotenv==1.0.0
 gunicorn==21.2.0
+SpeechRecognition>=3.10.0
+

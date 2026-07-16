@@ -62,7 +62,6 @@ Content:
                 "model": self.model,
                 "prompt": full_prompt,
                 "stream": True,
-                "think": True,
                 "options": {
                     "temperature": 0.6,
                     "top_p": 0.9,
